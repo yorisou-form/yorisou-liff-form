@@ -2,7 +2,9 @@
  * よりそう 支援依頼 LIFF フォーム
  * LIFF ID: 2012611374-Vn57eys9
  *
- * 送信は liff.sendMessages でトークへ構造化テキストを投稿する。
+ * 送信は、トーク内なら liff.sendMessages で構造化テキストを投稿する。
+ * トーク外・外部ブラウザ・送信失敗時は line.me/R/oaMessage/@065boblz で
+ * 公式アカウントのトークを開き、同じ本文を入力欄に入れる。
  * 既存の Messaging API Webhook → ルーティンがこれを受信して受付番号を返す。
  */
 (function () {
@@ -272,7 +274,8 @@
       state.data = data;
       renderSummary(data);
       $("send-error").hidden = true;
-      $("confirm-out-of-line").hidden = state.inClient;
+      $("send-error").className = "send-error";
+      $("confirm-out-of-line").hidden = canSendInChat();
       showScreen("screen-confirm");
     });
 
@@ -293,26 +296,91 @@
     });
   }
 
+  var OA_MESSAGE_BASE = "https://line.me/R/oaMessage/@065boblz/?";
+  var OA_MESSAGE_MAX_LEN = 2000;
+  var CHAT_CONTEXT_TYPES = { utou: true, group: true, room: true, square_chat: true };
+
+  function canSendInChat() {
+    if (!state.inClient || !window.liff || !liff.sendMessages) return false;
+    var ctx = liff.getContext ? liff.getContext() : null;
+    var type = ctx && ctx.type;
+    return !!(type && CHAT_CONTEXT_TYPES[type]);
+  }
+
+  function truncateMessageForOa(text) {
+    if ((OA_MESSAGE_BASE + encodeURIComponent(text)).length <= OA_MESSAGE_MAX_LEN) {
+      return text;
+    }
+
+    var marker = "支援内容：";
+    var idx = text.lastIndexOf(marker);
+    var head;
+    var body;
+    if (idx < 0) {
+      head = "";
+      body = text;
+    } else {
+      head = text.slice(0, idx + marker.length);
+      body = text.slice(idx + marker.length);
+      if (body.charAt(0) === "\n") {
+        head += "\n";
+        body = body.slice(1);
+      }
+    }
+
+    var lo = 0;
+    var hi = body.length;
+    var best = head + "…";
+    if ((OA_MESSAGE_BASE + encodeURIComponent(best)).length > OA_MESSAGE_MAX_LEN) {
+      var cut = text;
+      while (cut.length && (OA_MESSAGE_BASE + encodeURIComponent(cut + "…")).length > OA_MESSAGE_MAX_LEN) {
+        cut = cut.slice(0, -1);
+      }
+      return cut + "…";
+    }
+    while (lo <= hi) {
+      var mid = Math.floor((lo + hi) / 2);
+      var candidate = head + body.slice(0, mid) + "…";
+      if ((OA_MESSAGE_BASE + encodeURIComponent(candidate)).length <= OA_MESSAGE_MAX_LEN) {
+        best = candidate;
+        lo = mid + 1;
+      } else {
+        hi = mid - 1;
+      }
+    }
+    return best;
+  }
+
+  function showFallbackGuidance() {
+    var errEl = $("send-error");
+    errEl.className = "send-hint";
+    errEl.textContent = "トーク画面に移動します。内容を確認して送信ボタンを押してください。";
+    errEl.hidden = false;
+  }
+
+  function openOaMessage(text) {
+    var url = OA_MESSAGE_BASE + encodeURIComponent(truncateMessageForOa(text));
+    showFallbackGuidance();
+    if (state.inClient && window.liff && liff.openWindow) {
+      try {
+        liff.openWindow({ url: url, external: false });
+        return;
+      } catch (e) {
+        /* fall through to location.href */
+      }
+    }
+    window.location.href = url;
+  }
+
   function onSend() {
     if (state.sending || !state.data) return;
     var message = buildMessage(state.data);
     var errEl = $("send-error");
     errEl.hidden = true;
+    errEl.className = "send-error";
 
-    if (!state.inClient || !window.liff || !liff.sendMessages) {
-      errEl.textContent =
-        "LINEアプリ内から開いて送信してください。下の「修正する」の下ではなく、内容をコピーしてトークに貼ることもできます。\n\n" +
-        message;
-      errEl.hidden = false;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(message).then(
-          function () {
-            errEl.textContent =
-              "LINEアプリ内から開いたときだけ自動送信できます。依頼内容をクリップボードにコピーしました。公式アカウントのトークに貼り付けて送信してください。";
-          },
-          function () {}
-        );
-      }
+    if (!canSendInChat()) {
+      openOaMessage(message);
       return;
     }
 
@@ -325,13 +393,8 @@
       .then(function () {
         showScreen("screen-done");
       })
-      .catch(function (err) {
-        var code = (err && (err.code || err.message)) || "不明なエラー";
-        errEl.textContent =
-          "送信できませんでした（" +
-          code +
-          "）。LIFFのスコープに chat_message.write が入っているか確認し、もう一度お試しください。";
-        errEl.hidden = false;
+      .catch(function () {
+        openOaMessage(message);
       })
       .finally(function () {
         state.sending = false;

@@ -4,7 +4,7 @@
 
 - LIFF ID: `2012611374-Vn57eys9`
 - LINE Login チャネル: `2012611374`（公開済み）
-- 送信方法: `liff.sendMessages` でトークへ構造化テキストを投稿（既存 Webhook / ルーティンで受信）
+- 送信方法: トーク内では `liff.sendMessages` で構造化テキストを投稿。トーク外・送信失敗時は `https://line.me/R/oaMessage/@065boblz/?` で公式アカウントのトークを開き、同じ本文を入力欄に入れる（既存 Webhook / ルーティンで受信）
 
 このフォルダは静的ファイルだけです。サーバー側の新規 API は使いません。
 
