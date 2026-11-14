@@ -141,7 +141,8 @@
       hospital: valueOf("hospital"),
       department: valueOf("department"),
       appointmentTime: valueOf("appointmentTime"),
-      startTimePlace: valueOf("startTimePlace"),
+      startTime: valueOf("startTime"),
+      place: valueOf("place"),
       notes: valueOf("notes"),
     };
   }
@@ -170,7 +171,8 @@
       req("department", "受診科", data.department);
       req("appointmentTime", "予約時間", data.appointmentTime);
     } else if (data.supportType) {
-      req("startTimePlace", "開始時間・場所", data.startTimePlace);
+      clearError("startTime");
+      clearError("place");
     }
 
     errors.forEach(function (e) {
@@ -202,7 +204,8 @@
       lines.push("受診科：" + oneLine(data.department));
       lines.push("予約時間：" + oneLine(data.appointmentTime));
     } else {
-      lines.push("開始時間・場所：" + oneLine(data.startTimePlace));
+      lines.push("開始時間：" + oneLine(data.startTime || "未定"));
+      lines.push("場所：" + oneLine(data.place || "未定"));
     }
     if (data.notes) {
       lines.push("支援内容：");
@@ -227,7 +230,8 @@
       rows.push(["受診科", data.department]);
       rows.push(["予約時間", formatTime(data.appointmentTime)]);
     } else {
-      rows.push(["開始時間・場所", data.startTimePlace]);
+      rows.push(["開始時間", formatTime(data.startTime) || "未定"]);
+      rows.push(["場所", data.place || "未定"]);
     }
     rows.push(["支援内容・備考", data.notes || "（なし）"]);
 

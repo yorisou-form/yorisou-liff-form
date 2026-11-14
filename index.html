@@ -8,7 +8,7 @@
   <title>支援依頼｜一般社団法人よりそう</title>
   <link rel="icon" href="favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="favicon.png">
-  <link rel="stylesheet" href="styles.css?v=20261114d">
+  <link rel="stylesheet" href="styles.css?v=20261114e">
 </head>
 <body>
   <div class="app">
@@ -104,9 +104,17 @@
           </div>
 
           <div id="fields-other" class="conditional" hidden>
+            <p class="section-title">開始時間・場所（任意）</p>
             <div class="field">
-              <label for="startTimePlace">開始時間・場所<span class="req">必須</span></label>
-              <input id="startTimePlace" name="startTimePlace" type="text" maxlength="160" placeholder="例：10:00／〇〇病院 玄関">
+              <label for="startTime">開始時間</label>
+              <input id="startTime" name="startTime" type="time">
+              <p class="hint">分からなければ空欄のままで構いません。未定として送ります。</p>
+              <p class="field-error" hidden></p>
+            </div>
+            <div class="field">
+              <label for="place">場所</label>
+              <input id="place" name="place" type="text" maxlength="160" placeholder="例：〇〇病院 玄関">
+              <p class="hint">分からなければ空欄のままで構いません。未定として送ります。</p>
               <p class="field-error" hidden></p>
             </div>
           </div>
@@ -147,6 +155,6 @@
   </div>
 
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <script src="app.js?v=20261114d"></script>
+  <script src="app.js?v=20261114e"></script>
 </body>
 </html>
