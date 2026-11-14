@@ -9,8 +9,6 @@
   --text: #1A1A1A;
   --muted: #5C665E;
   --danger: #D92D20;
-  --urgent: #C2410C;
-  --urgent-bg: #FFF1E8;
   --line: #D7E0D8;
   --shadow: 0 8px 24px rgba(11, 80, 36, 0.08);
   --radius: 14px;
@@ -210,47 +208,30 @@ textarea:focus {
   margin: 0 0 18px;
 }
 
-.pills {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-.pill {
-  display: block;
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  user-select: none;
 }
 
-.pill input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
+.check input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--green);
+  flex-shrink: 0;
 }
 
-.pill span {
-  display: block;
-  text-align: center;
-  border: 1.5px solid var(--line);
-  background: var(--card);
-  border-radius: 12px;
-  padding: 12px 10px;
-  font-weight: 700;
-}
-
-.pill input:focus-visible + span {
-  box-shadow: 0 0 0 3px rgba(6, 199, 85, 0.2);
-}
-
-.pill input:checked + span {
-  border-color: var(--green);
-  background: var(--green-soft);
-  color: var(--green-deep);
-}
-
-.pill-urgent input:checked + span {
-  border-color: var(--urgent);
-  background: var(--urgent-bg);
-  color: var(--urgent);
+input[type="date"]:disabled {
+  background: #EEF2EE;
+  color: var(--muted);
+  cursor: not-allowed;
 }
 
 .actions {
@@ -335,7 +316,6 @@ textarea:focus {
   font-weight: 600;
 }
 
-.summary .is-urgent dd { color: var(--urgent); }
 
 .send-error {
   color: var(--danger);

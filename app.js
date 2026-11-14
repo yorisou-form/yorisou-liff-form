@@ -80,6 +80,27 @@
     return type === "受診同行";
   }
 
+  function isNoPreferredDate() {
+    var el = $("noPreferredDate");
+    return !!(el && el.checked);
+  }
+
+  function toggleNoPreferredDate() {
+    var noDate = isNoPreferredDate();
+    var input = $("preferredDate");
+    if (!input) return;
+    input.disabled = noDate;
+    if (noDate) {
+      input.value = "";
+      clearError("preferredDate");
+    }
+  }
+
+  function preferredDateLabel(data) {
+    if (data.noPreferredDate) return "希望日なし";
+    return data.preferredDate || "";
+  }
+
   function toggleConditional() {
     var type = valueOf("supportType");
     var shushin = $("fields-shushin");
@@ -111,7 +132,8 @@
       requester: valueOf("requester"),
       clientName: valueOf("clientName"),
       supportType: valueOf("supportType"),
-      preferredDate: valueOf("preferredDate"),
+      noPreferredDate: isNoPreferredDate(),
+      preferredDate: isNoPreferredDate() ? "" : valueOf("preferredDate"),
       pickupPlace: valueOf("pickupPlace"),
       pickupTime: valueOf("pickupTime"),
       hospital: valueOf("hospital"),
@@ -119,7 +141,6 @@
       appointmentTime: valueOf("appointmentTime"),
       startTimePlace: valueOf("startTimePlace"),
       notes: valueOf("notes"),
-      urgency: (document.querySelector('input[name="urgency"]:checked') || {}).value || "通常",
     };
   }
 
@@ -133,7 +154,12 @@
     req("requester", "依頼者", data.requester);
     req("clientName", "利用者名", data.clientName);
     req("supportType", "支援の種類", data.supportType);
-    req("preferredDate", "希望日", data.preferredDate);
+    clearError("preferredDate");
+    if (data.noPreferredDate) {
+      /* 希望日なしは日付なしで送信可 */
+    } else {
+      req("preferredDate", "希望日", data.preferredDate);
+    }
 
     if (isShushin(data.supportType)) {
       req("pickupPlace", "お迎え先", data.pickupPlace);
@@ -165,7 +191,7 @@
       "依頼者：" + oneLine(data.requester),
       "利用者名：" + oneLine(data.clientName),
       "支援の種類：" + oneLine(data.supportType),
-      "希望日：" + oneLine(data.preferredDate),
+      "希望日：" + oneLine(preferredDateLabel(data)),
     ];
     if (isShushin(data.supportType)) {
       lines.push("お迎え先：" + oneLine(data.pickupPlace));
@@ -176,7 +202,6 @@
     } else {
       lines.push("開始時間・場所：" + oneLine(data.startTimePlace));
     }
-    lines.push("緊急度：" + oneLine(data.urgency));
     if (data.notes) {
       lines.push("支援内容：");
       lines.push(String(data.notes).trim());
@@ -191,7 +216,7 @@
       ["依頼者", data.requester],
       ["利用者名", data.clientName],
       ["支援の種類", data.supportType],
-      ["希望日", formatDate(data.preferredDate) + "\n" + data.preferredDate],
+      ["希望日", data.noPreferredDate ? "希望日なし" : formatDate(data.preferredDate) + "\n" + data.preferredDate],
     ];
     if (isShushin(data.supportType)) {
       rows.push(["お迎え先", data.pickupPlace]);
@@ -202,14 +227,12 @@
     } else {
       rows.push(["開始時間・場所", data.startTimePlace]);
     }
-    rows.push(["緊急度", data.urgency]);
     rows.push(["支援内容・備考", data.notes || "（なし）"]);
 
     var dl = $("confirm-summary");
     dl.innerHTML = "";
     rows.forEach(function (row) {
       var wrap = document.createElement("div");
-      if (row[0] === "緊急度" && row[1] === "至急") wrap.className = "is-urgent";
       var dt = document.createElement("dt");
       dt.textContent = row[0];
       var dd = document.createElement("dd");
@@ -230,7 +253,9 @@
   function initFormChrome() {
     $("preferredDate").min = todayJST();
     $("supportType").addEventListener("change", toggleConditional);
+    $("noPreferredDate").addEventListener("change", toggleNoPreferredDate);
     toggleConditional();
+    toggleNoPreferredDate();
 
     $("request-form").addEventListener("submit", function (ev) {
       ev.preventDefault();

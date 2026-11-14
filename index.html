@@ -8,7 +8,7 @@
   <title>支援依頼｜一般社団法人よりそう</title>
   <link rel="icon" href="favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="favicon.png">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=20261114c">
 </head>
 <body>
   <div class="app">
@@ -57,6 +57,7 @@
               <option value="入退院支援">入退院支援</option>
               <option value="転院・送迎">転院・送迎</option>
               <option value="手続き同行">手続き同行</option>
+              <option value="買物支援">買物支援</option>
               <option value="その他">その他</option>
             </select>
             <p class="field-error" hidden></p>
@@ -64,7 +65,12 @@
 
           <div class="field">
             <label for="preferredDate">希望日<span class="req">必須</span></label>
-            <input id="preferredDate" name="preferredDate" type="date" required>
+            <input id="preferredDate" name="preferredDate" type="date">
+            <label class="check" for="noPreferredDate">
+              <input type="checkbox" id="noPreferredDate" name="noPreferredDate">
+              <span>希望日なし</span>
+            </label>
+            <p class="hint">まだ日が決まっていないときは「希望日なし」を選んでください。</p>
             <p class="field-error" hidden></p>
           </div>
 
@@ -110,20 +116,6 @@
             <textarea id="notes" name="notes" rows="4" maxlength="1000" placeholder="ほかに伝えておきたいことがあればご記入ください"></textarea>
           </div>
 
-          <fieldset class="field">
-            <legend>緊急度<span class="req">必須</span></legend>
-            <div class="pills" role="radiogroup" aria-label="緊急度">
-              <label class="pill">
-                <input type="radio" name="urgency" value="通常" checked>
-                <span>通常</span>
-              </label>
-              <label class="pill pill-urgent">
-                <input type="radio" name="urgency" value="至急">
-                <span>至急</span>
-              </label>
-            </div>
-          </fieldset>
-
           <div class="actions">
             <button type="submit" class="btn btn-primary" id="btn-review">内容を確認して送信</button>
           </div>
@@ -155,6 +147,6 @@
   </div>
 
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=20261114c"></script>
 </body>
 </html>
