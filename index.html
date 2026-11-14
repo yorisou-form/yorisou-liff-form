@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="theme-color" content="#06C755">
+  <title>支援依頼｜一般社団法人よりそう</title>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="favicon.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <p class="header-org">一般社団法人よりそう</p>
+      <h1>支援依頼</h1>
+    </header>
+
+    <main class="main">
+      <section id="screen-loading" class="screen" aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>読み込み中です…</p>
+      </section>
+
+      <section id="screen-error" class="screen" hidden>
+        <div class="notice notice-error">
+          <p id="error-message">ページを開けませんでした。</p>
+        </div>
+        <button type="button" class="btn btn-secondary" id="btn-retry">再読み込み</button>
+      </section>
+
+      <section id="screen-form" class="screen" hidden>
+        <div class="notice notice-info">
+          受付は8:30〜16:00の支援が対象です。担当者と日程は、確認がとれしだいご連絡します。
+        </div>
+
+        <form id="request-form" novalidate>
+          <div class="field">
+            <label for="requester">依頼者<span class="req">必須</span></label>
+            <input id="requester" name="requester" type="text" autocomplete="name" required maxlength="80" placeholder="お名前">
+            <p class="hint">LINEの表示名を入れています。必要なら修正してください。</p>
+            <p class="field-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="clientName">利用者名<span class="req">必須</span></label>
+            <input id="clientName" name="clientName" type="text" autocomplete="off" required maxlength="80" placeholder="支援を受けられる方のお名前">
+            <p class="field-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="supportType">支援の種類<span class="req">必須</span></label>
+            <select id="supportType" name="supportType" required>
+              <option value="" disabled selected>選択してください</option>
+              <option value="受診同行">受診同行</option>
+              <option value="入退院支援">入退院支援</option>
+              <option value="転院・送迎">転院・送迎</option>
+              <option value="手続き同行">手続き同行</option>
+              <option value="その他">その他</option>
+            </select>
+            <p class="field-error" hidden></p>
+          </div>
+
+          <div class="field">
+            <label for="preferredDate">希望日<span class="req">必須</span></label>
+            <input id="preferredDate" name="preferredDate" type="date" required>
+            <p class="field-error" hidden></p>
+          </div>
+
+          <div id="fields-shushin" class="conditional" hidden>
+            <p class="section-title">受診同行の詳細</p>
+            <div class="field">
+              <label for="pickupPlace">お迎え先<span class="req">必須</span></label>
+              <input id="pickupPlace" name="pickupPlace" type="text" maxlength="120" placeholder="ご自宅の住所、施設名など">
+              <p class="field-error" hidden></p>
+            </div>
+            <div class="field">
+              <label for="pickupTime">お迎え時間<span class="req">必須</span></label>
+              <input id="pickupTime" name="pickupTime" type="time">
+              <p class="field-error" hidden></p>
+            </div>
+            <div class="field">
+              <label for="hospital">病院名<span class="req">必須</span></label>
+              <input id="hospital" name="hospital" type="text" maxlength="120" placeholder="例：小倉記念病院">
+              <p class="field-error" hidden></p>
+            </div>
+            <div class="field">
+              <label for="department">受診科<span class="req">必須</span></label>
+              <input id="department" name="department" type="text" maxlength="80" placeholder="例：循環器内科">
+              <p class="field-error" hidden></p>
+            </div>
+            <div class="field">
+              <label for="appointmentTime">予約時間<span class="req">必須</span></label>
+              <input id="appointmentTime" name="appointmentTime" type="time">
+              <p class="field-error" hidden></p>
+            </div>
+          </div>
+
+          <div id="fields-other" class="conditional" hidden>
+            <div class="field">
+              <label for="startTimePlace">開始時間・場所<span class="req">必須</span></label>
+              <input id="startTimePlace" name="startTimePlace" type="text" maxlength="160" placeholder="例：10:00／〇〇病院 玄関">
+              <p class="field-error" hidden></p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="notes">支援内容・備考</label>
+            <textarea id="notes" name="notes" rows="4" maxlength="1000" placeholder="ほかに伝えておきたいことがあればご記入ください"></textarea>
+          </div>
+
+          <fieldset class="field">
+            <legend>緊急度<span class="req">必須</span></legend>
+            <div class="pills" role="radiogroup" aria-label="緊急度">
+              <label class="pill">
+                <input type="radio" name="urgency" value="通常" checked>
+                <span>通常</span>
+              </label>
+              <label class="pill pill-urgent">
+                <input type="radio" name="urgency" value="至急">
+                <span>至急</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="actions">
+            <button type="submit" class="btn btn-primary" id="btn-review">内容を確認して送信</button>
+          </div>
+        </form>
+      </section>
+
+      <section id="screen-confirm" class="screen" hidden>
+        <p class="confirm-lead">次の内容でトークに送信します。間違いがないかご確認ください。</p>
+        <dl class="summary" id="confirm-summary"></dl>
+        <div class="notice notice-warn" id="confirm-out-of-line" hidden>
+          LINEアプリのトークから開いたときだけ送信できます。この画面の内容をコピーして、公式アカウントのトークに貼ることもできます。
+        </div>
+        <p class="send-error" id="send-error" hidden></p>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="btn-send">送信する</button>
+          <button type="button" class="btn btn-secondary" id="btn-back">修正する</button>
+        </div>
+      </section>
+
+      <section id="screen-done" class="screen" hidden>
+        <div class="done-mark" aria-hidden="true">✓</div>
+        <h2>トークに依頼を送りました</h2>
+        <p>トーク画面に戻ると、依頼内容と受付完了のメッセージをご確認いただけます。受付番号は、返信メッセージに記載されます。</p>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="btn-close">トークに戻る</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
